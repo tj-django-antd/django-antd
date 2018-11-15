@@ -1,0 +1,30 @@
+{
+  "name": "django-antd",
+  "version": "1.0.0",
+  "description": "Base setup for django and antd design",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jackton1/django-antd.git"
+  },
+  "keywords": [
+    "django",
+    "antd",
+    "react",
+    "django-react"
+  ],
+  "author": "Tonye Jack",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jackton1/django-antd/issues"
+  },
+  "homepage": "https://github.com/jackton1/django-antd#readme",
+  "dependencies": {
+    "antd": "^3.10.7",
+    "react": "^16.6.3",
+    "react-dom": "^16.6.3"
+  }
+}
