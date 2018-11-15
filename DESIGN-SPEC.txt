@@ -1,0 +1,16 @@
+This repo contains based integration with django and ant design https://ant.design.
+
+- A react and django integration that will enable serializing models to react forms/components
+- Integration with django forms i.e logic on forms should be translated to react components
+- Pick a transpiler i.e babel to convert es6 to es5 or minified scripts.
+- React support to be able to sync validations on boot up. i.e a metaclass to check for changes on the
+form/models and sync the changes.
+- Have both django view and django rest framework integration. ie. specifying endpoints to save forms.
+- Support native browser tab index and enter form submission.
+- Should also allow customization of components.
+- Translate python validation to react.
+- Datetime timezone support for datetime inputs (naive) vs (aware) datetime objects.
+- I8n translation support to leverage gettext lazy evaluated text. This might be difficult for calculated
+ strings i.e determined at run time.
+- Native support for converting forms to react based rendered forms i.e (as_p), (as_react)
+- Future work convert DRF serializers to react based components.
