@@ -8,6 +8,7 @@ from django.core.management import BaseCommand
 from django.forms import fields_for_model
 from django.forms import models, fields
 from django.template import loader
+from django.utils.encoding import force_text
 from django.utils.html import escape
 
 
@@ -16,26 +17,25 @@ class Command(BaseCommand):
     Auto-generate model fields as react components using this CLI command script.
 
     Examples:
-        $ python manage.py createmodelcomponent -m Offer
+        $ python manage.py createmodelcomponent my_app_label -m Offer
         # Use -r to replace existing model components.
 
     To restrict the number of fields on the model to a subset simply add
-    an attribute to the model ANT_MODEL_FIELD_NAMES.
+    a private attribute to the model _ANT_MODEL_FIELD_LABELS.
 
     Examples:
         class MyModel(models.Model)
             title = models.CharField(...)
             extra_field = models.CharField(...)
 
-            ANT_MODEL_FIELD_NAMES = ['title'] # Only creates a title field.
+            _ANT_MODEL_FIELD_LABELS = {
+                'title': 'Title', # Field name and field label
+             }  # Creates a title field component with a label 'Title'.
 
     Model Attributes:
-        ANT_MODEL_FIELD_NAMES (list): List of field names.
-        ANT_MODEL_FIELD_LABELS (dict): Dictionary of field and labels.
+        _ANT_MODEL_FIELD_LABELS (dict): Dictionary of field and labels.
     """
-    app_name = 'content_library'
-    help = 'Creates an ant design react component based on models fields.'
-    exclude_fields = ['client', 'created_by', 'updated_by', 'created_at', 'updated_at']
+    help = 'Creates an ant-design react component based on models fields.'
 
     FIELD_MAP = {
         fields.IntegerField: ('number', 'InputNumber'),
@@ -60,8 +60,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
-            '-m', '--model', nargs='+',
-            type=str, required=True, help='Model name.',
+             'app_label', nargs='?',
+            help='App label of an application to generate form components.',
+        )
+        parser.add_argument(
+            '-m', '--model', type=str, required=True, help='Model name.',
         )
         parser.add_argument(
             '-r', '--replace-existing', action='store_true',
@@ -80,9 +83,13 @@ class Command(BaseCommand):
             '-u', '--use-placeholder', action='store_true',
             help='Add default placeholder to fields.',
         )
+        parser.add_argument(
+            '-e', '--excluded-fields', nargs='+',
+            type=str, help='Excluded model fields',
+        )
 
-    def _get_model(self, model_name):
-        return getattr(import_module(f'{self.app_name}.models'), model_name, None)
+    def _get_model(self, app_label, model_name):
+        return getattr(import_module(f'{app_label}.models'), model_name, None)
 
     def _get_title_text(self, title):
         return escape(title)
@@ -145,13 +152,13 @@ class Command(BaseCommand):
             'field': field,
         }
 
-    def _get_form(self, form_class):
-        return getattr(import_module(f'{self.app_name}.forms'), form_class, None)
+    def _get_form(self, app_label, form_class):
+        return getattr(import_module(f'{app_label}.forms'), form_class, None)
 
     @staticmethod
     def _get_location(options, verbose_name, model_name):
-        output_path = os.path.join(options['output_path'], verbose_name.replace(" ", "_").lower())
-        file_name = options['file_name'] or f'{model_name}FormFields.js'
+        output_path = os.path.join(options['output_path'], verbose_name.replace(" ", "").title())
+        file_name = options['file_name'] or f'{model_name.title()}FormFields.js'
 
         return output_path, file_name
 
@@ -169,15 +176,17 @@ class Command(BaseCommand):
         elif field_type in ['textarea']:
             return ('TextArea', 'Input')
 
-    def _get_context(self, model, model_name, use_placeholder):
-        fields = getattr(model, 'ANT_MODEL_FIELD_NAMES', None)
-        labels = getattr(model, 'ANT_MODEL_FIELD_LABELS', None)
+    def _get_context(self, model, model_name, excluded_fields, use_placeholder):
+        ant_field_labels = getattr(model, '_ANT_MODEL_FIELD_LABELS', {})
         components = []
         imports = set()
         sub_imports = set()
 
         model_fields = fields_for_model(
-            model, fields=fields, exclude=self.exclude_fields, labels=labels,
+            model,
+            fields=ant_field_labels.keys(),
+            exclude=excluded_fields,
+            labels=ant_field_labels,
         )
 
         for f_name, field in model_fields.items():
@@ -200,32 +209,37 @@ class Command(BaseCommand):
         return fs.save(file_name, ContentFile(content))
 
     def handle(self, *args, **options):
-        models = options['model']
+        app_label = options['app_label']
+        model = options['model']
+        excluded_fields = options['excluded_fields']
         replace_existing = options['replace_existing']
         use_placeholder = options['use_placeholder']
 
-        for model_name in models:
-            model = self._get_model(model_name)
-            verbose_name = model._meta.verbose_name
-            output_path, file_name = self._get_location(options, verbose_name, model_name)
+        model_class = self._get_model(app_label, model)
+        verbose_name = force_text(model_class._meta.verbose_name)
+        output_path, file_name = self._get_location(options, verbose_name, model)
 
-            if not os.path.exists(output_path):
-                os.makedirs(output_path, exist_ok=True)
+        if not os.path.exists(output_path):
+            os.makedirs(output_path, exist_ok=True)
 
-            fs = FileSystemStorage(location=output_path)
-            if fs.exists(file_name):
-                if replace_existing:
-                    fs.delete(file_name)
-                else:
-                    self.stdout.write(
-                        self.style.WARNING(
-                            f'File "{file_name}" already exists a new component file will be created.',
-                        ),
-                    )
+        fs = FileSystemStorage(location=output_path)
+        if fs.exists(file_name):
+            if replace_existing:
+                fs.delete(file_name)
+            else:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f'File "{file_name}" already exists a new component file will be created.',
+                    ),
+                )
 
-            output = self._render_js(fs, file_name, self._get_context(model, model_name, use_placeholder))
-            self.stdout.write(
-                self.style.SUCCESS(
-                    f'Successfully created component file "{output}": \n{fs.path(output)}',
-                ),
-            )
+        output = self._render_js(
+            fs,
+            file_name,
+            self._get_context(model_class, model, excluded_fields, use_placeholder),
+        )
+        self.stdout.write(
+            self.style.SUCCESS(
+                f'Successfully created component file "{output}": \n{fs.path(output)}',
+            ),
+        )
