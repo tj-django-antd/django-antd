@@ -1,2 +1,4 @@
 # django-antd
-Ant design Integration with django.
+[Ant design](https://ant.design/docs/react/introduce) Integration with django.
+
+
