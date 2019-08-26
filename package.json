@@ -23,8 +23,8 @@
   },
   "homepage": "https://github.com/jackton1/django-antd#readme",
   "dependencies": {
-    "antd": "^3.10.7",
-    "react": "^16.6.3",
-    "react-dom": "^16.6.3"
+    "antd": "^3.22.1",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
   }
 }
