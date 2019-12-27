@@ -7,7 +7,7 @@
     "react-dom": "^16.9.0",
     "react-scripts-ts": "3.1.0",
     "lodash": "^4.17.13",
-    "handlebars": "^4.0.14",
+    "handlebars": "^4.3.0",
     "lodash.template": "^4.5.0",
     "mem": "^4.0.0",
     "braces": "^2.3.1",
