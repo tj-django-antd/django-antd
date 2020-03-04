@@ -1,4 +1,4 @@
-This repo contains based integration with django and ant design https://ant.design.
+This repo contains base integration with django and ant design https://ant.design.
 
 - A react and django integration that will enable serializing models to react forms/components
 - Integration with django forms i.e logic on forms should be translated to react components
