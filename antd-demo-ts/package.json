@@ -9,7 +9,7 @@
     "lodash": "4.17.15",
     "handlebars": "4.3.0",
     "lodash.template": "4.5.0",
-    "mem": "4.3.0",
+    "mem": "6.1.0",
     "braces": "2.3.2",
     "js-yaml": "3.13.1"
   },
