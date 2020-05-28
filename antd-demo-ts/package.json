@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "react": "^16.9.0",
-    "react-dom": "^16.9.0",
+    "react": "16.9.0",
+    "react-dom": "16.9.0",
     "react-scripts-ts": "3.1.0",
-    "lodash": "^4.17.13",
-    "handlebars": "^4.3.0",
-    "lodash.template": "^4.5.0",
-    "mem": "^4.0.0",
-    "braces": "^2.3.1",
-    "js-yaml": "^3.13.1"
+    "lodash": "4.17.15",
+    "handlebars": "4.3.0",
+    "lodash.template": "4.5.0",
+    "mem": "4.3.0",
+    "braces": "2.3.2",
+    "js-yaml": "3.13.1"
   },
   "scripts": {
     "start": "react-scripts-ts start",
@@ -20,11 +20,11 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
-    "@types/jest": "^23.3.14",
-    "@types/node": "^9.6.51",
-    "@types/react": "^16.7.22",
-    "@types/react-dom": "^16.0.11",
-    "typescript": "^3.5.3",
-    "webpack-dev-server": "^3.1.11"
+    "@types/jest": "23.3.14",
+    "@types/node": "9.6.51",
+    "@types/react": "16.9.2",
+    "@types/react-dom": "16.9.0",
+    "typescript": "3.5.3",
+    "webpack-dev-server": "3.8.0"
   }
 }
