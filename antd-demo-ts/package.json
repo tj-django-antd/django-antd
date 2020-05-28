@@ -10,7 +10,7 @@
     "handlebars": "4.3.0",
     "lodash.template": "4.5.0",
     "mem": "4.3.0",
-    "braces": "2.3.2",
+    "braces": "3.0.2",
     "js-yaml": "3.13.1"
   },
   "scripts": {
